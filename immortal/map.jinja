@@ -1,0 +1,9 @@
+{% set conf = salt['grains.filter_by']({
+    'Debian':  {
+        'source': 'https://github.com/immortal/immortal/releases/download/0.14.0/immortal_0.14.0_amd64.deb',
+        'etc-path': '/etc',
+    },
+    'FreeBSD': {
+        'etc-path': '/usr/local/etc',
+    },
+}, grain='os_family', merge=salt['pillar.get']('immortal:lookup')) %}
