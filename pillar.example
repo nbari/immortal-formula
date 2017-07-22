@@ -1,6 +1,4 @@
-immortal_conf: default
-
 # Defaults can be overwritten, see immortal/map.jinja for default values
 # immortal:
 #   lookup:
-#     SDIR: '/var/service'
+#     immortaldir_path: '/var/service'

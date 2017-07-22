@@ -1,31 +1,32 @@
 {% from "immortal/map.jinja" import conf with context %}
 
-fetch_immortal:
+immortal:
 {% if grains['os_family'] == 'FreeBSD' %}
-  pkg.installed:
-    - name: immortal
+  pkg.installed
 {% elif grains['os_family'] == 'Debian' %}
   pkg.installed:
     - sources:
       - immortal: {{ conf.source }}
 {% endif %}
 
-{{ conf.get('sv-dir') }}/immortal:
+{{ conf.get('immortaldir_path') }}:
   file.directory:
     - makedirs: True
 
-immortaldir:
-  service:
-    - running
-    - provider: runit
-    - watch:
-      - file: immortal
+{% if grains['os_family'] == 'Debian' %}
+/etc/systemd/system/immortaldir.service:
   file.managed:
-    - name: {{ conf.get('etc-path', '/usr/local/etc') }}/immortal.yml
     - template: jinja
-    - makedirs: True
-    - source: salt://immortal/files/{{ pillar.get('immortal_conf', 'generic') }}.yml
+    - source: salt://immortal/files/immortaldir.service
+{% endif %}
 
-{{ conf.get('SVDIR', '/service') }}/immortal:
-  file.symlink:
-    - target: {{ conf.get('sv-dir') }}
+immortaldir:
+{% if grains['os_family'] == 'FreeBSD' %}
+  sysrc.managed:
+    - name: immortaldir_path
+    - value: {{ conf.get('immortaldir_path') }}
+{% endif %}
+  service.running:
+    - enable: True
+    - require:
+      - pkg: immortal
