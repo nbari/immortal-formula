@@ -13,4 +13,3 @@ User=root
 
 [Install]
 WantedBy=multi-user.target
-Alias=immortaldir.service
