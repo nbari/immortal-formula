@@ -1,24 +1,22 @@
 {% from "immortal/map.jinja" import conf with context %}
 
-immortal:
-{% if grains['os_family'] == 'FreeBSD' %}
-  pkg.installed
-{% elif grains['os_family'] == 'Debian' %}
-  pkg.installed:
-    - sources:
-      - immortal: {{ conf.source }}
+{% if grains['os_family'] == 'Debian' or grains['os_family'] == 'RedHat' %}
+packagecloud_immortal:
+  cmd.run:
+{% if grains['os_family'] == 'Debian' %}
+    - name: "curl -s https://packagecloud.io/install/repositories/immortal/immortal/script.deb.sh | bash"
+{% elif grains['os_family'] == 'RedHat' %}
+    - name: "curl -s https://packagecloud.io/install/repositories/immortal/immortal/script.rpm.sh | bash"
 {% endif %}
+    - unless: test -f /usr/bin/immortal
+{% endif %}
+
+immortal:
+  pkg.installed
 
 {{ conf.get('immortaldir_path') }}:
   file.directory:
     - makedirs: True
-
-{% if grains['os_family'] == 'Debian' %}
-/etc/systemd/system/immortaldir.service:
-  file.managed:
-    - template: jinja
-    - source: salt://immortal/files/immortaldir.service
-{% endif %}
 
 immortaldir:
 {% if grains['os_family'] == 'FreeBSD' %}
